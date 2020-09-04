@@ -1,4 +1,4 @@
-package main
+package harass
 
 import (
 	"bytes"
@@ -37,7 +37,7 @@ func ParseWebConfigItem(item WebConfigItem) (req *http.Request) {
 		bytesData, _ := json.Marshal(item.RequestData.Data)
 		req, err = http.NewRequest("POST", requestUrl, bytes.NewReader(bytesData))
 		if err != nil {
-			fmt.Println(err, "==============")
+			log.Fatal(err)
 		}
 	case "form":
 		urlValues := url.Values{}
@@ -46,7 +46,7 @@ func ParseWebConfigItem(item WebConfigItem) (req *http.Request) {
 		}
 		req, err = http.NewRequest("POST", requestUrl, strings.NewReader(urlValues.Encode()))
 		if err != nil {
-			fmt.Println(err, "==============")
+			log.Fatal(err)
 		}
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	default:

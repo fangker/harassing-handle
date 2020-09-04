@@ -1,4 +1,4 @@
-package main
+package harass
 
 import (
 	"runtime"
@@ -38,6 +38,6 @@ var jsonString string = `
 
 func TestHarass_Do(t *testing.T) {
 	runtime.GOMAXPROCS(4)
-	h := NewHarass(loadHarassingConfig(jsonString))
+	h := NewHarass(&HarParamConfig{Phone: "12345", ConfigPath: "../config.json"})
 	h.Do()
 }

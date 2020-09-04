@@ -1,4 +1,4 @@
-package main
+package harass
 
 import (
 	"fmt"
@@ -9,6 +9,11 @@ import (
 	"time"
 )
 
+type HarParamConfig struct {
+	Phone      string
+	Name       string
+	ConfigPath string
+}
 type Harass struct {
 	config    *HarassingConfig
 	total     int
@@ -17,14 +22,16 @@ type Harass struct {
 	sync.Mutex
 }
 
-func NewHarass(config *HarassingConfig) *Harass {
+func NewHarass(hpc *HarParamConfig) *Harass {
+	config := LoadHarassingConfig(hpc)
 	config.Info()
 	return &Harass{config: config, total: len(config.List)}
 }
 
 type submitInfo struct {
-	url  string
-	name string
+	urlName string
+	url     string
+	params  interface{}
 }
 
 func getSubmitInfo(s submitInfo) string {
@@ -48,12 +55,13 @@ func (h *Harass) Do() {
 			fmt.Sprintf("%s", body)
 			h.Lock()
 			//fmt.Printf(string(body), err)
+			rinfo := submitInfo{urlName: item.Name, url: item.RequestURL, params: item.RequestData.Data}
 			if err != nil {
 				h.errCount++
-				e <- submitInfo{name: item.Name, url: item.RequestURL}
+				e <- rinfo
 			} else {
 				h.doneCount++
-				d <- submitInfo{name: item.Name, url: item.RequestURL}
+				d <- rinfo
 			}
 			quitTag <- 1
 			h.Unlock()
